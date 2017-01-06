@@ -1,0 +1,28 @@
+version: '2'
+# make sure you search for and replace the below settings
+  # /path/to - search for the path to the certificatiosn and replace with the correct path
+
+services:
+  #Nginx server
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+      volumes:
+        - /etc/nginx/conf.d
+        - /etc/nginx/vhost.d
+        - /usr/share/nginx/html
+        - /path/to/certs:/etc/nginx/certs:ro
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  whoami:
+    image: jwilder/whoami
+    environment:
+      - VIRTUAL_HOST=whoami.local
