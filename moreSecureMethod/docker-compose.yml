@@ -1,6 +1,4 @@
 version: '2'
-#
-
 # make sure you search for and replace the below settings
   # /path/to/certs - search for the path to the certifications and replace with the correct path
   # /path/to/nginx.tmpl - search for the path to nginx.tmpl and replace with the correct path
@@ -21,6 +19,8 @@ services:
         - /usr/share/nginx/html
         - /path/to/certs:/etc/nginx/certs:ro
 
+  #nginx-gen
+  #repository   https://github.com/jwilder/docker-gen
   nginx-gen:
     image: jwilder/docker-gen
     container_name: nginx-gen
