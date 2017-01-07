@@ -2,6 +2,8 @@ version: '2'
 # make sure you search for and replace the below settings
   # /path/to/certs - search for the path to the certifications and replace with the correct path
   # /path/to/nginx.tmpl - search for the path to nginx.tmpl and replace with the correct path
+  # $hotname=docker-2gb-nyc3-01
+
 
 services:
 
@@ -48,4 +50,53 @@ services:
    ports:
      - "85:80"
    environment:
-     - VIRTUAL_HOST=shipyd.uorder.us
+     - VIRTUAL_HOST=kodi.uorder.us
+
+  rethinkdb:
+    image: rethinkdb
+    container_name: shipyard-rethinkdb
+    ports:
+      - "8080"
+      - "28015"
+      - "29015"
+
+  shipyard-discovery:
+    image: microbox/etcd
+    container_name: shipyard-discovery
+    command: -name discovery
+    restart: always
+    ports:
+      - "4001:4001"
+      - "7001:7001"
+
+  shipyard-proxy:
+    image: shipyard/docker-proxy:latest
+    container_name: shipyard-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    hostname: docker-2gb-nyc3-01
+    ports:
+      - "2375:2375"
+
+  swarm:
+    image: swarm:latest
+    container_name: swarm
+    command: m --host tcp://0.0.0.0:2375 proxy:2375
+    links:
+      - shipyard-proxy:proxy
+    ports:
+      - "2375"
+
+  shipyard-controller:
+    image: shipyard/shipyard:latest
+    container_name: shipyard-controller
+    restart: always
+    command: -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375
+    links:
+      - rethinkdb
+      - swarm
+    ports:
+      - "8080:8080"
+    environment:
+      - VIRTUAL_HOST=shipyd.uorder.us
