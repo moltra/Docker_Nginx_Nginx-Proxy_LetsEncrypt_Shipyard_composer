@@ -108,9 +108,5 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
-    ports:
-      - "8125:8125/UDP"
-      - "9001:9001"
     environment:
-      - VIRTUAL_HOST=dd.uorder.us
       - API_KEY={my key}
